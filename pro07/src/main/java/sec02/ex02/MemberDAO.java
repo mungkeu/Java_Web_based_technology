@@ -1,0 +1,120 @@
+package sec02.ex02;
+
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.sql.DataSource;
+
+public class MemberDAO {
+
+	private Connection con;
+	private PreparedStatement pstmt;
+	private DataSource dataFactory;
+	
+	public MemberDAO() {
+		try {
+			Context ctx = new InitialContext();
+			Context envContext = (Context) ctx.lookup("java:/comp/env");
+			dataFactory = (DataSource) envContext.lookup("jdbc/oracle");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	// 멤버리스트 조회
+	public List listMembers() {
+		List list = new ArrayList();
+		try {
+			con=dataFactory.getConnection();
+			System.out.println();
+			String query = "select * from t_member ";
+			System.out.println("prepareStatememt: " + query);
+			pstmt = con.prepareStatement(query);
+			ResultSet rs = pstmt.executeQuery();
+			
+			while (rs.next()) {
+				String id = rs.getString("id");
+				System.out.println(id);
+				String pwd = rs.getString("pwd");
+				String name = rs.getString("name");
+				String email = rs.getString("email");
+				Date joinDate = rs.getDate("joinDate");
+				MemberVO vo = new MemberVO();
+				vo.setId(id);
+				vo.setPwd(pwd);
+				vo.setName(name);
+				vo.setEmail(email);
+				vo.setJoinDate(joinDate);
+				list.add(vo);
+			}
+			rs.close();
+			pstmt.close();
+			con.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return list;
+	}
+	
+	// 멤버추가
+	public void addMember(MemberVO memberVO) 
+	{
+		try 
+		{
+			// DataSource를 이용해서 DB와 연결
+			con = dataFactory.getConnection();
+			
+			// 테이블에 저장할 회원벙보를 받아온다.
+			String id = memberVO.getId();
+			System.out.println(id);
+			String pwd = memberVO.getPwd();
+			System.out.println(pwd);
+			String name = memberVO.getName();
+			System.out.println(name);
+			String email = memberVO.getEmail();
+			System.out.println(email);
+			
+			//insert문 문자열 작성
+			String query="insert into t_member";
+			query +=" (ID,PWD,NAME,EMAIL)";
+			query +=" values(?,?,?,?)";
+			System.out.println("prepareStatement: "+query);
+			
+			pstmt = con.prepareStatement(query);
+			pstmt.setString(1, id);	// insert문의 각?에 순서대로 셋팅.
+			pstmt.setString(2, pwd);
+			pstmt.setString(3, name);
+			pstmt.setString(4, email);
+			pstmt.executeUpdate(); // 회원 정보를 테이블에 추가.
+			pstmt.close();
+		} catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	// 멤버삭제
+	public void delMember(String id)
+	{
+		try 
+		{
+			con = dataFactory.getConnection();
+			
+			String query = "delete from t_member" + " where id=?";
+			System.out.println("prepareStatement: "+query);
+			pstmt = con.prepareStatement(query);
+			pstmt.setString(1, id);
+			pstmt.executeUpdate();
+			pstmt.close();
+		} catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+}

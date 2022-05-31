@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app>
+	<context-param>
+		<param-name>menu_member</param-name>
+		<param-value>회원등록 회원조회 회원수정</param-value>
+	</context-param>
+	<context-param>
+		<param-name>menu_order</param-name>
+		<param-value>주문조회 주문등록 주문수정 주문취소</param-value>
+	</context-param>
+	<context-param>
+		<param-name>menu_goods</param-name>
+		<param-value>상품조회 상품등록 상품수정 상품삭제</param-value>
+	</context-param>
+
+	<servlet>
+		<servlet-name>sinit</servlet-name>
+		<servlet-class>sec06.ex01.initParamServlet</servlet-class>
+			<init-param>
+				<param-name>email</param-name>
+				<param-value>admin@jweb.com</param-value>
+			</init-param>
+			<init-param>
+				<param-name>tel</param-name>
+				<param-value>010-111-2222</param-value>
+			</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>sinit</servlet-name>
+		<url-pattern>/first</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<!-- 애너테이션으로 서블릿 생성 시 name 속성 값으로 설정한다. -->
+		<servlet-name>loadConfig</servlet-name>
+		<!-- 패키지 이름까지 포함된 서블릿 클래스 이름을 설정한다. -->
+		<servlet-class>sec06.ex02.LoadAppConfig</servlet-class>
+		<!-- 우선순위를 설정한다. -->
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>loadConfig</servlet-name>
+		<url-pattern>/loadConfig</url-pattern>
+	</servlet-mapping>
+</web-app>
